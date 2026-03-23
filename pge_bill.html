@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PG&E Energy Statement</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #000; background: #fff; }
+  .page { width: 850px; margin: 0 auto; padding: 20px; }
+
+  /* Header */
+  .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #003087; padding-bottom: 8px; margin-bottom: 10px; }
+  .logo-area { display: flex; align-items: center; gap: 10px; }
+  .pge-logo { width: 60px; height: 60px; background: #003087; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+  .pge-logo-inner { color: white; font-size: 16px; font-weight: bold; line-height: 1; }
+  .logo-text h1 { font-size: 22px; font-weight: bold; color: #000; }
+  .logo-text p { font-size: 10px; color: #003087; }
+  .header-right { text-align: right; font-size: 10px; }
+  .header-right .label { color: #555; }
+  .header-right .value { font-weight: bold; }
+  .due-date-row { background: #003087; color: white; padding: 3px 8px; margin-top: 4px; font-weight: bold; font-size: 11px; }
+
+  /* Top notice bar */
+  .notice-bar { background: #003087; color: white; font-size: 10px; padding: 4px 10px; margin-bottom: 10px; }
+
+  /* Main content grid */
+  .main-grid { display: grid; grid-template-columns: 240px 1fr; gap: 15px; margin-bottom: 15px; }
+
+  /* Left column */
+  .service-block h3 { font-size: 11px; font-weight: bold; border-bottom: 1px solid #003087; margin-bottom: 5px; padding-bottom: 2px; }
+  .service-block p { font-size: 10px; line-height: 1.5; }
+  .service-block .name { font-weight: bold; }
+  .section-header { font-weight: bold; font-size: 10px; background: #e0e0e0; padding: 2px 4px; margin-top: 8px; margin-bottom: 4px; }
+  .contact-info { font-size: 10px; line-height: 1.6; }
+
+  /* Right column */
+  .account-summary { }
+  .account-summary h2 { font-size: 14px; font-weight: bold; margin-bottom: 8px; }
+  .summary-table { width: 100%; border-collapse: collapse; }
+  .summary-table td { padding: 2px 5px; font-size: 11px; }
+  .summary-table .amount { text-align: right; }
+  .summary-table tr.total-row td { border-top: 1px solid #000; font-weight: bold; }
+  .summary-table tr.credit td { color: #000; }
+  .summary-table tr.zero-row td { border-bottom: 1px solid #ccc; }
+
+  /* Total due box */
+  .total-due-box { border: 2px solid #003087; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+  .total-due-box .label { font-size: 13px; font-weight: bold; }
+  .total-due-box .amount { font-size: 22px; font-weight: bold; }
+
+  /* Chart section */
+  .chart-section { border: 1px solid #ccc; padding: 10px; margin-top: 10px; }
+  .chart-section-title { font-size: 11px; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .chart-area { display: flex; gap: 10px; }
+  .bar-chart { flex: 1; height: 100px; display: flex; align-items: flex-end; gap: 3px; border-bottom: 1px solid #999; border-left: 1px solid #999; position: relative; padding: 4px 2px 0 2px; }
+  .bar-group { display: flex; gap: 1px; align-items: flex-end; }
+  .bar { width: 14px; display: flex; flex-direction: column; justify-content: flex-end; }
+  .bar-el { width: 14px; }
+  .bar-electric { background: #000; }
+  .bar-gas { background: #ccc; }
+  .bar-labels { display: flex; gap: 3px; font-size: 7px; color: #555; margin-top: 3px; }
+  .chart-y-labels { display: flex; flex-direction: column; justify-content: space-between; font-size: 8px; padding-right: 4px; height: 100px; }
+  .chart-x-labels { display: flex; gap: 3px; font-size: 7px; color: #555; margin-left: 20px; }
+  .chart-legend { display: flex; gap: 10px; font-size: 9px; margin-top: 5px; align-items: center; }
+  .legend-item { display: flex; align-items: center; gap: 3px; }
+  .legend-box { width: 12px; height: 12px; }
+  .legend-electric { background: #000; }
+  .legend-gas { background: #ccc; border: 1px solid #999; }
+  .chart-note { font-size: 8px; color: #555; margin-top: 4px; text-align: center; font-style: italic; }
+
+  /* Daily usage comparison */
+  .daily-usage { width: 160px; font-size: 9px; border-left: 1px solid #ccc; padding-left: 10px; }
+  .daily-usage-title { font-size: 9px; font-weight: bold; text-align: right; margin-bottom: 5px; }
+  .usage-header { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 8px; color: #555; }
+  .usage-row { margin-bottom: 6px; }
+  .usage-bars { display: flex; gap: 4px; align-items: flex-end; height: 30px; }
+  .usage-bar { width: 24px; display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .usage-bar-fill { width: 100%; background: #000; }
+  .usage-bar-label { font-size: 7px; }
+  .usage-type { font-size: 8px; margin-top: 2px; color: #333; }
+
+  /* Important messages */
+  .important-messages { margin-top: 12px; }
+  .important-messages h3 { font-size: 11px; font-weight: bold; margin-bottom: 5px; }
+  .important-messages p { font-size: 10px; line-height: 1.5; margin-bottom: 6px; }
+
+  /* Dotted cut line */
+  .cut-line { border-top: 1px dashed #999; margin: 15px 0; position: relative; }
+  .cut-line-text { font-size: 9px; color: #555; text-align: center; background: white; display: inline-block; padding: 0 10px; position: absolute; top: -6px; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+
+  /* Payment stub */
+  .payment-stub { border: 1px solid #ccc; }
+  .stub-header { background: #003087; padding: 6px 10px; display: flex; align-items: center; gap: 10px; }
+  .stub-logo { color: white; font-size: 14px; font-weight: bold; border: 2px solid white; padding: 2px 6px; }
+  .stub-header-right { flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center; gap: 10px; }
+  .stub-field { background: white; padding: 4px 8px; font-size: 10px; }
+  .stub-field .stub-label { font-size: 9px; color: #555; }
+  .stub-field .stub-value { font-weight: bold; font-size: 12px; }
+  .stub-body { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 10px 15px; }
+  .stub-address { font-size: 10px; line-height: 1.6; }
+  .stub-address .company { font-size: 11px; font-weight: bold; }
+  .stub-right { font-size: 10px; text-align: right; line-height: 1.6; }
+
+  /* Page 2 */
+  .page-break { page-break-before: always; margin-top: 40px; border-top: 3px solid #003087; padding-top: 15px; }
+
+  /* Page 2 two-column layout */
+  .page2-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  /* Phone numbers box */
+  .phone-box { border: 2px solid #000; padding: 8px 10px; margin-bottom: 12px; grid-column: 1/-1; }
+  .phone-box h3 { font-size: 11px; font-weight: bold; margin-bottom: 6px; border-bottom: 1px solid #000; padding-bottom: 3px; }
+  .phone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 10px; }
+  .phone-row { display: flex; justify-content: space-between; }
+  .phone-row .phone-label { color: #000; }
+  .phone-row .phone-num { font-weight: bold; }
+  .tty { font-weight: bold; font-size: 11px; margin-top: 3px; }
+
+  /* Rules and rates */
+  .rules-section h3 { font-size: 11px; font-weight: bold; margin-bottom: 5px; }
+  .rules-section p { font-size: 10px; line-height: 1.5; margin-bottom: 6px; }
+  .rules-section p strong { font-weight: bold; }
+
+  /* Electric charges breakdown */
+  .charges-box { border: 1px solid #ccc; padding: 8px; }
+  .charges-box h3 { font-size: 11px; font-weight: bold; margin-bottom: 6px; border-bottom: 1px solid #ccc; padding-bottom: 3px; }
+  .charges-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+  .charges-table td { padding: 2px 3px; }
+  .charges-table td:last-child { text-align: right; }
+  .charges-table tr.total td { border-top: 1px solid #000; font-weight: bold; }
+
+  /* Definitions */
+  .definitions h4 { font-size: 10px; font-weight: bold; margin-top: 6px; }
+  .definitions p { font-size: 9.5px; line-height: 1.4; margin-bottom: 4px; }
+
+  /* Footer copyright */
+  .copyright { font-size: 9px; color: #555; margin-top: 10px; border-top: 1px solid #ccc; padding-top: 5px; }
+
+  /* Update info section */
+  .update-section { border: 1px solid #ccc; padding: 8px; margin-top: 10px; }
+  .update-section h3 { font-size: 10px; font-weight: bold; margin-bottom: 4px; }
+  .update-section p { font-size: 9px; color: #555; margin-bottom: 6px; }
+  .form-row { display: flex; gap: 8px; align-items: baseline; font-size: 10px; margin-bottom: 5px; flex-wrap: wrap; }
+  .form-label { font-weight: bold; white-space: nowrap; }
+  .form-underline { border-bottom: 1px solid #000; flex: 1; min-width: 100px; }
+  .account-bold { font-weight: bold; font-size: 11px; margin-bottom: 6px; }
+
+  /* Ways to pay */
+  .ways-section h3 { font-size: 10px; font-weight: bold; margin-bottom: 5px; }
+  .ways-section ul { padding-left: 12px; font-size: 9.5px; line-height: 1.6; }
+  .ways-section ul li { margin-bottom: 3px; }
+
+  .page-num { text-align: right; font-size: 10px; color: #555; margin-top: 15px; }
+  .italic { font-style: italic; }
+</style>
+</head>
+<body>
+
+<!-- ========== PAGE 1 ========== -->
+<div class="page">
+
+  <!-- Notice bar top -->
+  <div class="notice-bar">
+    Please return this portion with your payment. No staples or paper clips. Do not fold. Thank you.
+  </div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-area">
+      <div class="pge-logo">
+        <div class="pge-logo-inner" style="font-size:11px;">PG&amp;E</div>
+      </div>
+      <div class="logo-text">
+        <h1>ENERGY STATEMENT</h1>
+        <p>www.pge.com/MyEnergy</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div><span class="label">Account No: </span><span class="value">5033876473-2</span></div>
+      <div><span class="label">Statement Date: </span><span class="value">01/12/2025</span></div>
+      <div class="due-date-row">Due Date: &nbsp;&nbsp;<strong>01/01/2026</strong></div>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="main-grid">
+    <!-- Left column -->
+    <div>
+      <div class="service-block">
+        <h3>Service For:</h3>
+        <p class="name">A+ Linden Pest Control</p>
+        <p>Linden</p>
+        <p>501-599 W Edgar Rd</p>
+        <p>Linden, NJ 07036, United States</p>
+      </div>
+      <div class="section-header">Questions about your bill?</div>
+      <div class="contact-info">
+        <p>Monday-Friday 7 a.m.-9 p.m.</p>
+        <p>Saturday 8 a.m.-6 p.m.</p>
+        <p>Phone: 1-800-743-5000</p>
+        <p>www.pge.com/MyEnergy</p>
+      </div>
+      <div class="section-header" style="margin-top:10px;">Ways To Pay</div>
+      <div class="contact-info">
+        <p>www.pge.com/waystopay</p>
+      </div>
+    </div>
+
+    <!-- Right column: Account Summary -->
+    <div class="account-summary">
+      <h2>Your Account Summary</h2>
+      <table class="summary-table">
+        <tr>
+          <td>Amount Due on Previous Statement</td>
+          <td class="amount">$91.57</td>
+        </tr>
+        <tr class="credit">
+          <td>Payment(s) Received Since Last Statement</td>
+          <td class="amount">-91.57</td>
+        </tr>
+        <tr class="zero-row">
+          <td>Previous Unpaid Balance</td>
+          <td class="amount">$0.00</td>
+        </tr>
+        <tr>
+          <td>Current PG&amp;E Electric Delivery Charges</td>
+          <td class="amount">$55.66</td>
+        </tr>
+        <tr>
+          <td>Silicon Valley Clean Energy Electric Generation Charges</td>
+          <td class="amount">$32.48</td>
+        </tr>
+      </table>
+      <div class="total-due-box">
+        <div class="label">Total Amount Due <span style="font-weight:normal;font-size:11px;">by 01/01/2026</span></div>
+        <div class="amount">$88.14</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart + Usage Section -->
+  <div class="chart-section">
+    <div class="chart-section-title">
+      <span>Monthly Billing History</span>
+      <span style="font-weight:normal;font-size:10px;">Daily Usage Comparison</span>
+    </div>
+    <div class="chart-area">
+      <!-- Bar chart -->
+      <div style="flex:1;">
+        <div style="display:flex; align-items:flex-end; gap:0;">
+          <div class="chart-y-labels">
+            <span>$200</span>
+            <span>$150</span>
+            <span>$100</span>
+            <span>$50</span>
+            <span>$0</span>
+          </div>
+          <!-- bars approximate from the chart -->
+          <div class="bar-chart">
+            <!-- Each month approx heights as % of $200 -->
+            <!-- 8/07: ~$80 electric, ~$30 gas -->
+            <div class="bar-group"><div class="bar-el bar-electric" style="height:40px;width:10px;"></div><div class="bar-el bar-gas" style="height:15px;width:10px;"></div></div>
+            <div class="bar-group"><div class="bar-el bar-electric" style="height:50px;width:10px;"></div><div class="bar-el bar-gas" style="height:18px;width:10px;"></div></div>
+            <div class="bar-group"><div class="bar-el bar-electric" style="height:55px;width:10px;"></div><div class="bar-el bar-gas" style="height:20px;width:10px;"></div></div>
+            <div class="bar-group"><div class="bar-el bar-electric" style="height:62px;width:10px;"></div><div class="bar-el bar-gas" style="height:25px;width:10px;"></div></div>
+            <div class="bar-group"><div class="bar-el bar-electric" style="height:75px;width:10px;"></div><div class="bar-el bar-gas" style="height:30px;width:10px;"></div></div>
+            <div class="bar-group"><div class="bar-el bar-electric" style="height:85px;width:10px;"></div><div class="bar-el bar-gas" style="height:35px;width:10px;"></div></div>
+            <div class="bar-group"><div class="bar-el bar-electric" style="height:60px;width:10px;"></div><div class="bar-el bar-gas" style="height:28px;width:10px;"></div></div>
+            <div class="bar-group"><div class="bar-el bar-electric" style="height:45px;width:10px;"></div><div class="bar-el bar-gas" style="height:22px;width:10px;"></div></div>
+            <div class="bar-group"><div class="bar-el bar-electric" style="height:40px;width:10px;"></div><div class="bar-el bar-gas" style="height:18px;width:10px;"></div></div>
+            <div class="bar-group"><div class="bar-el bar-electric" style="height:55px;width:10px;"></div><div class="bar-el bar-gas" style="height:22px;width:10px;"></div></div>
+            <div class="bar-group"><div class="bar-el bar-electric" style="height:70px;width:10px;"></div><div class="bar-el bar-gas" style="height:28px;width:10px;"></div></div>
+            <div class="bar-group"><div class="bar-el bar-electric" style="height:80px;width:10px;"></div><div class="bar-el bar-gas" style="height:32px;width:10px;"></div></div>
+            <div class="bar-group"><div class="bar-el bar-electric" style="height:44px;width:10px;"></div><div class="bar-el bar-gas" style="height:17px;width:10px;"></div></div>
+          </div>
+        </div>
+        <div style="display:flex; gap:2px; font-size:8px; margin-left:22px; color:#555;">
+          <span style="margin-right:2px;">2024</span>
+          <span style="width:20px; text-align:center;">8/07</span>
+          <span style="width:20px; text-align:center;">9/06</span>
+          <span style="width:20px; text-align:center;">10/04</span>
+          <span style="width:20px; text-align:center;">11/06</span>
+          <span style="width:20px; text-align:center;">12/06</span>
+          <span style="width:20px; text-align:center;">1/08</span>
+          <span style="width:20px; text-align:center;">2/06</span>
+          <span style="width:20px; text-align:center;">3/07</span>
+          <span style="width:20px; text-align:center;">4/08</span>
+          <span style="width:20px; text-align:center;">5/09</span>
+          <span style="width:20px; text-align:center;">6/06</span>
+          <span style="width:20px; text-align:center;">7/10</span>
+          <span style="width:20px; text-align:center;">8/07</span>
+          <span style="margin-left:2px;">2025</span>
+        </div>
+        <div class="chart-legend" style="margin-left:22px; margin-top:4px;">
+          <div class="legend-item"><div class="legend-box legend-electric"></div><span>Electric</span></div>
+          <div class="legend-item"><div class="legend-box legend-gas"></div><span>Gas</span></div>
+        </div>
+        <div class="chart-note">Visit www.pge.com/MyEnergy for a detailed bill comparison</div>
+      </div>
+
+      <!-- Daily usage comparison -->
+      <div class="daily-usage">
+        <div class="usage-header">
+          <span>1 Year<br>Ago</span>
+          <span>Last<br>Period</span>
+          <span>Current<br>Period</span>
+        </div>
+        <!-- Electric kWh/Day -->
+        <div class="usage-row">
+          <div class="usage-bars">
+            <div class="usage-bar">
+              <div class="usage-bar-fill" style="height:20px;"></div>
+              <div class="usage-bar-label">12.50</div>
+            </div>
+            <div class="usage-bar">
+              <div class="usage-bar-fill" style="height:19px;"></div>
+              <div class="usage-bar-label">12.16</div>
+            </div>
+            <div class="usage-bar">
+              <div class="usage-bar-fill" style="height:21px;"></div>
+              <div class="usage-bar-label">12.67</div>
+            </div>
+          </div>
+          <div class="usage-type">Electric kWh / Day</div>
+        </div>
+        <!-- Gas Therms/Day -->
+        <div class="usage-row" style="margin-top:8px;">
+          <div class="usage-bars">
+            <div class="usage-bar">
+              <div class="usage-bar-fill" style="height:8px; background:#ccc; border:1px solid #999;"></div>
+              <div class="usage-bar-label">0.12</div>
+            </div>
+            <div class="usage-bar">
+              <div class="usage-bar-fill" style="height:10px; background:#ccc; border:1px solid #999;"></div>
+              <div class="usage-bar-label">0.16</div>
+            </div>
+            <div class="usage-bar">
+              <div class="usage-bar-fill" style="height:11px; background:#ccc; border:1px solid #999;"></div>
+              <div class="usage-bar-label">0.17</div>
+            </div>
+          </div>
+          <div class="usage-type">Gas Therms / Day</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Important Messages -->
+  <div class="important-messages">
+    <h3>Important Messages</h3>
+    <p>The Family Electric Rate Assistance (FERA) Program provides a monthly discount on electric bills for income-qualified households of three or more persons. To see if you qualify, please call <strong>1-800-PGE-5000</strong> or apply online at <strong>www.pge.com/fera</strong>.</p>
+    <p>El Programa FERA ofrece ahorros mensuales sólo en las facturas de electricidad a hogares de ingresos económicos bajos y medianos con tres o más personas. Para determinar si califica, por favor llame al <strong>1-800-PGE-5000</strong> o puede aplicar a través de nuestra página web <strong>www.pge.com/fera</strong>. <span class="italic">Continued on page 6</span></p>
+  </div>
+
+  <!-- Cut line -->
+  <div class="cut-line">
+    <span class="cut-line-text">Please return this portion with your payment. No staples or paper clips. Do not fold. Thank you.</span>
+  </div>
+
+  <!-- Payment Stub -->
+  <div style="margin-top: 30px;">
+    <div class="payment-stub">
+      <div class="stub-body">
+        <!-- Left: sender address -->
+        <div class="stub-address">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+            <div class="pge-logo" style="width:40px;height:40px;">
+              <div style="color:white;font-size:9px;font-weight:bold;">PG&amp;E</div>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:auto auto auto; gap:6px; font-size:10px; align-items:baseline; margin-bottom:6px;">
+            <span>Account Number:</span>
+            <span>Due Date:</span>
+            <span>Total Amount Due:</span>
+          </div>
+          <div style="display:grid; grid-template-columns:auto auto auto; gap:6px; font-size:13px; font-weight:bold; align-items:baseline; margin-bottom:10px;">
+            <span>5033876473-2</span>
+            <span>01/01/2026</span>
+            <span>$88.14</span>
+          </div>
+          <div style="margin-top:20px; font-size:10px; line-height:1.6;">
+            <div>James. Cooke</div>
+            <div>7961 Valley View St</div>
+            <div>La Palma, CA 90623</div>
+          </div>
+        </div>
+        <!-- Right: PG&E mailing address + amount box -->
+        <div style="display:flex; flex-direction:column; justify-content:space-between; align-items:flex-end;">
+          <div style="border:1px solid #ccc; padding:8px 12px; font-size:11px; text-align:left; min-width:180px;">
+            <div style="font-size:10px; color:#555; margin-bottom:4px;">Amount Enclosed:</div>
+            <div style="border-bottom:1px solid #ccc; height:24px; background:#f9f9f9; padding:4px; display:flex; align-items:center;"><strong>$</strong></div>
+          </div>
+          <div style="font-size:10px; line-height:1.6; text-align:right; margin-top:20px;">
+            <div><strong>PG&amp;E</strong></div>
+            <div>BOX 997300</div>
+            <div>SACRAMENTO, CA 95899-7300</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-num">Page 1 of 6</div>
+
+
+  <!-- ========== PAGE 2 ========== -->
+  <div class="page-break">
+
+    <!-- Header repeat -->
+    <div class="header" style="margin-bottom:12px;">
+      <div class="logo-area">
+        <div class="pge-logo">
+          <div class="pge-logo-inner" style="font-size:11px;">PG&amp;E</div>
+        </div>
+        <div class="logo-text">
+          <h1>ENERGY STATEMENT</h1>
+          <p>www.pge.com/MyEnergy</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div><span class="label">Account No: </span><span class="value">5033876473-2</span></div>
+        <div><span class="label">Statement Date: </span><span class="value">01/12/2025</span></div>
+        <div class="due-date-row">Due Date: &nbsp;&nbsp;<strong>01/01/2026</strong></div>
+      </div>
+    </div>
+
+    <!-- Important Phone Numbers Box (full width) -->
+    <div class="phone-box">
+      <h3>Important Phone Numbers - Monday-Friday 7 a.m.-9 p.m., Saturday 8 a.m.-6 p.m.</h3>
+      <div style="font-size:12px; font-weight:bold; margin-bottom:4px;">Customer Service (All Languages; Relay Calls Accepted) 1-800-743-5000</div>
+      <div style="font-size:12px; font-weight:bold; margin-bottom:6px;">TTY 7-1-1</div>
+      <div class="phone-grid">
+        <div class="phone-row"><span class="phone-label">Servicio al Cliente en Español (Spanish)</span><span class="phone-num">1-800-660-6789</span></div>
+        <div class="phone-row"><span class="phone-label">Dịch vụ khách tiếng Việt (Vietnamese)</span><span class="phone-num">1-800-298-8438</span></div>
+        <div class="phone-row"><span class="phone-label">華語客戶服務 (Chinese)</span><span class="phone-num">1-800-893-9555</span></div>
+        <div class="phone-row"><span class="phone-label">Business Customer Service</span><span class="phone-num">1-800-468-4743</span></div>
+      </div>
+    </div>
+
+    <!-- Two-column layout -->
+    <div class="page2-grid">
+
+      <!-- Left: Rules and rates + Definitions -->
+      <div>
+        <div class="rules-section">
+          <h3>Rules and rates</h3>
+          <p>You may be eligible for a lower rate. To learn more about optional rates or view a complete list of rules and rates, visit www.pge.com or call 1-800-743-5000.</p>
+          <p><strong>If you believe there is an error on your bill,</strong> please call <strong>1-800-743-5000</strong> to speak with a representative. If you are not satisfied with our response, contact the California Public Utilities Commission (CPUC), Consumer Affairs Branch (CAB), 505 Van Ness Avenue, Room 2003, San Francisco, CA 94102, 1-800-649-7570 or 7-1-1 (8:30 AM to 4:30 PM, Monday through Friday) or by visiting www.cpuc.ca.gov/complaints/. To avoid having service turned off while you wait for the outcome of a complaint to the CPUC specifically regarding the accuracy of your bill, please contact CAB for assistance. If your case meets the eligibility criteria, CAB will provide you with instructions on how to mail a check or money order to be impounded pending resolution of your case. You must continue to pay your current charges while your complaint is under review to keep your service turned on.</p>
+          <p><strong>If you are not able to pay your bill,</strong> call PG&amp;E to discuss how we can help. You may qualify for reduced rates under PG&amp;E's CARE program or other special programs and agencies may be available to assist you. You may qualify for PG&amp;E's Energy Savings Assistance Program which is an energy efficiency program for income-qualified residential customers.</p>
+        </div>
+
+        <div class="definitions">
+          <h3 style="font-size:11px; font-weight:bold; margin-bottom:4px;">Important definitions</h3>
+          <p><strong>Rotating outage blocks</strong> are subject to change without advance notice due to operational conditions.</p>
+          <p><strong>Tier 1/Baseline allowance:</strong> Some residential rates are given a Tier 1/Baseline allowance - a CPUC approved percentage of average customer usage during summer and winter months. Your Tier 1/Baseline allowance provides for basic needs at an affordable price and encourages conservation. Your allowance is assigned based on the climate where you live, the season and your heat source. As you use more energy, you pay more for usage. Any usage over your baseline allowance will be charged at a higher price.</p>
+          <p><strong>High Usage:</strong> An increased price per kWh whenever electricity usage exceeds four times the Baseline Allowance (Tier 1) in a billing period. This charge does not apply to Time-of-Use rate plans.</p>
+        </div>
+      </div>
+
+      <!-- Right: Charges + Definitions continued -->
+      <div>
+        <!-- Electric Charges Breakdown -->
+        <div class="charges-box">
+          <h3>Your Electric Charges Breakdown</h3>
+          <table class="charges-table">
+            <tr><td>Conservation Incentive</td><td>-$9.50</td></tr>
+            <tr><td>Transmission</td><td>12.42</td></tr>
+            <tr><td>Distribution</td><td>35.08</td></tr>
+            <tr><td>Electric Public Purpose Programs</td><td>4.71</td></tr>
+            <tr><td>Nuclear Decommissioning</td><td>0.33</td></tr>
+            <tr><td>DWR Bond Charge</td><td>1.91</td></tr>
+            <tr><td>Competition Transition Charges (CTC)</td><td>0.42</td></tr>
+            <tr><td>Energy Cost Recovery Amount</td><td>-0.22</td></tr>
+            <tr><td>PCIA</td><td>10.26</td></tr>
+            <tr><td>Taxes and Other</td><td>0.25</td></tr>
+            <tr class="total"><td><strong>Total Electric Charges</strong></td><td><strong>$55.66</strong></td></tr>
+          </table>
+        </div>
+
+        <div class="definitions" style="margin-top:10px;">
+          <p><strong>DWR bond charge:</strong> Recovers the cost of bonds issued by the Department of Water Resources (DWR) to purchase power to serve electric customers during the California energy crisis. DWR bond charges are collected on behalf of DWR and do not belong to PG&amp;E.</p>
+          <p><strong>Power Charge Indifference Adjustment (PCIA):</strong> Ensures that non-exempt customers under PG&amp;E's GT and ECR rate schedules or who purchase electricity (generation) from non-PG&amp;E suppliers pay their share of generation costs.</p>
+          <p><strong>Gas Public Purpose Program (PPP) Surcharge.</strong> Used to fund state-mandated gas assistance programs for low-income customers, energy efficiency programs, and public-interest research and development.</p>
+          <p>Visit www.pge.com/billexplanation for more definitions. To view most recent bill inserts including legal or mandated notices, visit www.pge.com/billinserts.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="copyright">
+      "PG&amp;E" refers to Pacific Gas and Electric Company, a subsidiary of PG&amp;E Corporation. © 2019 Pacific Gas and Electric Company. All rights reserved. Please do not mark in box. For system use only.
+    </div>
+
+    <!-- Cut line -->
+    <div class="cut-line" style="margin-top:15px;">
+      <span class="cut-line-text">Please do not mark in box. For system use only.</span>
+    </div>
+
+    <!-- Page 2 bottom: two panels -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:25px;">
+
+      <!-- Update My Information -->
+      <div class="update-section">
+        <h3>Update My Information (English Only)</h3>
+        <p>Please allow 1-2 billing cycles for changes to take effect</p>
+        <div class="account-bold">Account Number: 5033876473-2</div>
+        <div class="form-row">
+          <span class="form-label">Change my mailing address to:</span>
+          <span style="font-weight:bold;">A+ Linden Pest Control</span>
+        </div>
+        <div class="form-row">
+          <span style="border-bottom:1px solid #000; flex:1; min-width:200px; display:inline-block;">501-599 W Edgar Rd</span>
+        </div>
+        <div class="form-row" style="margin-top:4px;">
+          <span>City</span>
+          <span style="border-bottom:1px solid #000; width:80px; display:inline-block;">Linden</span>
+          <span>State</span>
+          <span style="border-bottom:1px solid #000; width:25px; display:inline-block;">NJ</span>
+          <span>ZIP code</span>
+          <span style="border-bottom:1px solid #000; width:50px; display:inline-block;">07036</span>
+        </div>
+        <div class="form-row" style="margin-top:6px;">
+          <span>Primary</span>
+          <span style="margin-left:20px;">Primary</span>
+        </div>
+        <div class="form-row">
+          <span>Phone #</span>
+          <span style="font-weight:bold; margin-left:6px;">(908) 708-6031</span>
+          <span style="margin-left:20px;">Email</span>
+          <span style="font-weight:bold; margin-left:6px;">info@alindenpestcontrol.com/</span>
+        </div>
+      </div>
+
+      <!-- Ways To Pay -->
+      <div class="ways-section">
+        <h3>Ways To Pay</h3>
+        <ul>
+          <li><strong>Online via web or mobile at www.pge.com/waystopay</strong></li>
+          <li><strong>By mail:</strong> Send your payment along with this payment stub in the envelope provided.</li>
+          <li><strong>By debit card, Visa, MasterCard, American Express, or Discover:</strong> Call 877-704-8470 at any time. (Our independent service provider charges a fee per transaction.)</li>
+          <li><strong>At a PG&amp;E payment center or local office:</strong> To find a payment center or local office near you, please visit www.pge.com or call 800-743-5000. Please bring a copy of your bill with you.</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="page-num">Page 2 of 6</div>
+
+  </div><!-- end page 2 -->
+
+</div><!-- end .page -->
+</body>
+</html>
